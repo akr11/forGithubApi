@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="chosenUserCollectionCell" id="gTV-IL-0wX" customClass="SelectedUserCollectionViewCell" customModule="forGithubApi" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="80" height="80"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="80" height="80"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iB8-Za-qmc">
+                        <rect key="frame" x="0.0" y="59" width="80" height="21"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="ynU-uS-i56"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="noAvatar" translatesAutoresizingMaskIntoConstraints="NO" id="WAb-MQ-jTp">
+                        <rect key="frame" x="12" y="0.0" width="56" height="56"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="56" id="14b-8h-gMV"/>
+                            <constraint firstAttribute="width" constant="56" id="nFF-vQ-6cR"/>
+                        </constraints>
+                    </imageView>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cuX-oM-WJ4">
+                        <rect key="frame" x="57" y="0.0" width="23" height="23"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="23" id="Gf9-Ek-e6T"/>
+                            <constraint firstAttribute="height" constant="23" id="ZrQ-mn-TR3"/>
+                        </constraints>
+                        <state key="normal" image="delete"/>
+                        <connections>
+                            <action selector="deleteClicked:" destination="gTV-IL-0wX" eventType="touchUpInside" id="Xch-TV-ROe"/>
+                        </connections>
+                    </button>
+                </subviews>
+            </view>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="iB8-Za-qmc" secondAttribute="trailing" id="EYf-xj-hVJ"/>
+                <constraint firstItem="WAb-MQ-jTp" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="HD9-R6-pVO"/>
+                <constraint firstAttribute="trailing" secondItem="cuX-oM-WJ4" secondAttribute="trailing" id="WLW-e9-usQ"/>
+                <constraint firstAttribute="bottom" secondItem="iB8-Za-qmc" secondAttribute="bottom" id="gDn-OO-MzZ"/>
+                <constraint firstItem="cuX-oM-WJ4" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="hFs-6q-ICH"/>
+                <constraint firstItem="WAb-MQ-jTp" firstAttribute="centerX" secondItem="gTV-IL-0wX" secondAttribute="centerX" id="prp-fo-GuT"/>
+                <constraint firstItem="iB8-Za-qmc" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="v9P-aA-M8G"/>
+                <constraint firstItem="iB8-Za-qmc" firstAttribute="top" secondItem="WAb-MQ-jTp" secondAttribute="bottom" constant="3" id="zX1-Zd-2fz"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <connections>
+                <outlet property="avatarImageView" destination="WAb-MQ-jTp" id="ael-Sm-mY0"/>
+                <outlet property="butonDelete" destination="cuX-oM-WJ4" id="tFy-yf-Lg6"/>
+                <outlet property="nameLabel" destination="iB8-Za-qmc" id="Meb-gm-Wy1"/>
+            </connections>
+            <point key="canvasLocation" x="84.799999999999997" y="52.173913043478265"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="delete" width="256" height="256"/>
+        <image name="noAvatar" width="50" height="50"/>
+    </resources>
+</document>
