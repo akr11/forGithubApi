@@ -31,5 +31,6 @@ extension User {
     @NSManaged public var public_repos: Int64
     @NSManaged public var url_details: String?
     @NSManaged public var chosen: Bool
+    @NSManaged public var dateClicked: Date?
 
 }

@@ -27,6 +27,8 @@ public class User: NSManagedObject {
             return userObject
         }
         
+        resultObject.dateClicked = nil
+                
         if let details = json["url"].string {
             resultObject.url_details = details
         }

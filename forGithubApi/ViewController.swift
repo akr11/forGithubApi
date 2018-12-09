@@ -12,7 +12,6 @@ import Kingfisher
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, ChooseDelegate, DeleteDelegate {
     @IBOutlet weak var curTableView: UITableView!
-    var dataArrayUsers: [User] = []
     var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>!
     var numberOfUsers: Int! = 0
     @IBOutlet weak var curCollectionView: UICollectionView!
@@ -53,7 +52,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             let managedObjectContext = CoredataStack.mainContext
             if let fetchedUser = try managedObjectContext.fetch(userFetch) as? [User] ,
                 fetchedUser.count > 0 {
-                dataArrayUsers = fetchedUser
                 curTableView.reloadData()
                 
                 curCollectionView.reloadData()
@@ -83,7 +81,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             let managedObjectContext = CoredataStack.mainContext
             if let fetchedUser = try managedObjectContext.fetch(userFetch) as? [User] ,
                 fetchedUser.count > 0 {
-                dataArrayUsers = fetchedUser
                 curTableView.reloadData()
                 curCollectionView.reloadData()
                 curCollectionView!.numberOfItems(inSection: 0)
@@ -100,8 +97,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     func chooseClick(tag: Int, userId: Int64) {
         let curIndex = IndexPath(row: tag, section: 0)
-        if let curUser = /*dataArrayUsers[curIndex.row] as? User*/self.fetchedResultsController?.object(at: curIndex) as? User {
+        if let curUser = self.fetchedResultsController?.object(at: curIndex) as? User {
             curUser.chosen = !curUser.chosen
+            curUser.dateClicked = Date()
             let managedObjectContext = CoredataStack.mainContext
             managedObjectContext.performAndWait { () -> Void in
                 do {
@@ -118,11 +116,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     //MARK: - DeleteDelegate
     
     func deleteClick(tag: Int, userId: Int64) {
-        let curIndex = IndexPath(row: tag, section: 0)
         if fetchedChosenResultsController?.fetchedObjects?.count ?? 0 > 0 {
             for curUs in (fetchedChosenResultsController?.fetchedObjects as! [User]) {
             if curUs.id == userId {
                 curUs.chosen = !curUs.chosen
+                curUs.dateClicked = nil
                 let managedObjectContext = CoredataStack.mainContext
                 managedObjectContext.performAndWait { () -> Void in
                     do {
@@ -194,7 +192,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     //MARK: - tableViewDelegate
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        print("numberOfRowsInSection = \(dataArrayUsers.count), section = \(section)")
+        print(" section = \(section)")
         guard let sections = fetchedResultsController.sections else {
             fatalError("No sections in fetchedResultsController")
         }
@@ -224,15 +222,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         URL(string: "https://avatars2.githubusercontent.com/u/\(curUser.id)?v=4&client_id=\(ApiManager.shared.clientId)&client_secret=\(ApiManager.shared.cs).jpg")!
         
         
-        _ = (cell as! UserTableViewCell).avatarImageView.kf.setImage(with: url,
-                                                                    placeholder: nil,
-                                                                    options: [.transition(ImageTransition.fade(1))],
-                                                                    progressBlock: { receivedSize, totalSize in
-                                                                        print("\(indexPath.row + 1): \(receivedSize)/\(totalSize)")
-        },
-                                                                    completionHandler: { image, error, cacheType, imageURL in
-                                                                        print("\(indexPath.row + 1): Finished")
-        })
+        _ = (cell as! UserTableViewCell).avatarImageView.kf.setImage(with: url)
         }
     }
     
@@ -287,8 +277,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     func initializeFetchedChosenResultsController() {
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "User")
         request.predicate = NSPredicate(format: "chosen == YES")
-        let nameSort = NSSortDescriptor(key: "id", ascending: true)
-        request.sortDescriptors = [nameSort]
+        //let nameSort = NSSortDescriptor(key: "id", ascending: true)
+        let dateClickedSort = NSSortDescriptor(key: "dateClicked", ascending: true)
+        request.sortDescriptors = [dateClickedSort]
         let managedObjectContext = CoredataStack.mainContext
         fetchedChosenResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: managedObjectContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedChosenResultsController.delegate = self
@@ -296,9 +287,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         do {
             try fetchedChosenResultsController.performFetch()
-            if fetchedChosenResultsController.fetchedObjects?.count == 0 {
-                
-            }
             
         } catch {
             fatalError("Failed to initialize FetchedChosenResultsController: \(error)")
@@ -316,10 +304,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         do {
             try fetchedResultsController.performFetch()
-            if fetchedResultsController.fetchedObjects?.count == 0 {
-               
-            }
-            
         } catch {
             fatalError("Failed to initialize FetchedResultsController: \(error)")
         }
@@ -344,7 +328,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                     curCollectionView.insertSections(IndexSet(integer: sectionIndex))
                     curCollectionView.reloadData()
                     curCollectionView!.numberOfItems(inSection: 0)
-                    curCollectionView.setNeedsDisplay()
                 }, completion: nil)
             }
         case .delete:
@@ -355,7 +338,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                     curCollectionView.deleteSections(IndexSet(integer: sectionIndex))
                     curCollectionView.reloadData()
                     curCollectionView!.numberOfItems(inSection: 0)
-                    curCollectionView.setNeedsDisplay()
                 }, completion: nil)
             }
         case .move:
@@ -372,16 +354,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             if controller == fetchedResultsController {
                 curTableView.insertRows(at: [newIndexPath!], with: .fade)
             } else {
-                if (numberOfChosen == 1) {
                     curCollectionView.insertItems(at: [newIndexPath!])
-                    curCollectionView.reloadData()
                     curCollectionView!.numberOfItems(inSection: 0)
-            } else {
-                    curCollectionView.insertItems(at: [newIndexPath!])
-                    curCollectionView.reloadData()
-                    curCollectionView!.numberOfItems(inSection: 0)
-                }
-                curCollectionView.reloadData()
             }
         case .delete:
             if controller == fetchedResultsController {                
@@ -419,7 +393,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             self.curCollectionView?.performBatchUpdates({
                 curCollectionView.reloadData()
                 curCollectionView!.numberOfItems(inSection: 0)
-                curCollectionView.setNeedsDisplay()
             }, completion: nil)
         }
     }

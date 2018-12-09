@@ -98,15 +98,6 @@ class ComposeMessageViewController: UIViewController, UICollectionViewDelegate, 
     }
     
     @IBAction func sendButtonClicked(_ sender: Any) {
-        let fileManager = FileManager.default
-        let myDocuments = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let diskCacheStorageBaseUrl = myDocuments.appendingPathComponent("diskCache")
-        guard let filePaths = try? fileManager.contentsOfDirectory(at: myDocuments, includingPropertiesForKeys: nil, options: []) else { return }
-        for filePath in filePaths {
-            if filePath.absoluteString.contains("jpg") {
-                try? fileManager.removeItem(at: filePath)
-            }
-        }
         KingfisherManager.shared.cache.clearMemoryCache()
         KingfisherManager.shared.cache.clearDiskCache()
         deleteAllData("User")
